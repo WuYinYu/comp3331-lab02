@@ -18,16 +18,17 @@ s.settimeout(1)
 #connect host
 s.connect((host, port))
 
+total = 0
+sumRTT = 0
+maxRTT = 0
+minRTT = 1000
+
 #send 10 ping requests to server
 for sequence_number in range(0, 10):
 	#send requests
 	now_time = time.time()
 	ping_message = "PING" + " " + str(sequence_number) + " " + str(now_time) + "\r\n"
 	s.sendto(ping_message, (host, port))
-    total = 0
-    sumRTT = 0
-    maxRTT = 1000
-    minRTT = 0
 	#receive response
 	try:
 		data, address = s.recvfrom(1024)
@@ -35,7 +36,7 @@ for sequence_number in range(0, 10):
 		diff = recv_time - now_time
 		rtt = (int)(1000 * diff + 0.5)
 		# calculate info
-		total++
+		total = total + 1
 		sumRTT = sumRTT + rtt
 		if (rtt > maxRTT):
 		    maxRTT = rtt
@@ -47,7 +48,7 @@ for sequence_number in range(0, 10):
 	time.sleep(1)
 	
 	# print all
-	print("Average rtt: " + str(sumRTT/total ) + " Max rtt: " + str(maxRTT) + " Min rtt: " + str(minRTT))
+print("Average rtt: " + str(sumRTT/total) + "ms Max rtt: " + str(maxRTT) + "ms Min rtt: " + str(minRTT) + "ms")
 
 
 s.close()
