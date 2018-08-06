@@ -16,7 +16,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.settimeout(1)
 
 #connect host
-#s.connect(host, port)
+s.connect((host, port))
 
 #send 10 ping requests to server
 for sequence_number in range(0, 10):
@@ -24,17 +24,30 @@ for sequence_number in range(0, 10):
 	now_time = time.time()
 	ping_message = "PING" + " " + str(sequence_number) + " " + str(now_time) + "\r\n"
 	s.sendto(ping_message, (host, port))
-
+    total = 0
+    sumRTT = 0
+    maxRTT = 1000
+    minRTT = 0
 	#receive response
 	try:
 		data, address = s.recvfrom(1024)
 		recv_time = time.time()
 		diff = recv_time - now_time
 		rtt = (int)(1000 * diff + 0.5)
+		# calculate info
+		total++
+		sumRTT = sumRTT + rtt
+		if (rtt > maxRTT):
+		    maxRTT = rtt
+		if (rtt < minRTT):
+		    minRTT = rtt 
 		print("Ping to " + host + ", seq = " + str(sequence_number) + ", rtt = " + str(rtt) + "ms")
-		time.sleep(1)
 	except socket.timeout:
 		print("Ping to " + host + ", seq = " + str(sequence_number) + ", time out")
+	time.sleep(1)
+	
+	# print all
+	print("Average rtt: " + str(sumRTT/total ) + " Max rtt: " + str(maxRTT) + " Min rtt: " + str(minRTT))
 
 
 s.close()
